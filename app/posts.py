@@ -51,3 +51,20 @@ def update_post(post_id: int, post: PostCreate, current_user: User = Depends(get
     db.commit()
     db.refresh(existing_post)
     return existing_post
+
+@router.delete("/posts/{post_id}")
+def delete_post(post_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    existing_post = db.query(Post).filter(Post.id == post_id).first()
+    if not existing_post:
+        raise HTTPException(
+            status_code=404,
+            detail="Post not found"
+        )
+    if existing_post.user_id != current_user.id:
+        raise HTTPException(
+            status_code=403,
+            detail="Not authorized to delete this post"
+        )
+    db.delete(existing_post)
+    db.commit()
+    return {"message":"Post deleted successfully"}
