@@ -55,6 +55,6 @@ def login(login_data: UserLogin, db: Session=Depends(get_db)):
     }
 
 # temporary endpoint
-@router.get("/me")
+@router.get("/me", response_model=UserResponse)
 def get_me(current_user: User = Depends(get_current_user)):
     return current_user

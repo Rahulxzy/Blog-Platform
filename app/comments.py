@@ -1,14 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from .schemas import CommentCreate
+from .schemas import CommentCreate, CommentResponse
 from .database import get_db
 from .models import Comment, User, Post
 from .security import get_current_user
 
 router = APIRouter()
 
-@router.post("/posts/{post_id}/comments")
+@router.post("/posts/{post_id}/comments", response_model=CommentResponse)
 def create_comment(post_id: int, comment: CommentCreate, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     existing_post = (db.query(Post).filter(Post.id == post_id).first())
     if not existing_post:
@@ -27,7 +27,7 @@ def create_comment(post_id: int, comment: CommentCreate, current_user: User = De
     db.refresh(new_comment)
     return new_comment
 
-@router.get("/posts/{post_id}/comments")
+@router.get("/posts/{post_id}/comments", response_model=list[CommentResponse])
 def get_comments(post_id: int, db: Session = Depends(get_db)):
     existing_post = (db.query(Post).filter(Post.id == post_id).first())
     if not existing_post:
@@ -40,7 +40,7 @@ def get_comments(post_id: int, db: Session = Depends(get_db)):
 
     return comments
 
-@router.put("/comments/{comment_id}")
+@router.put("/comments/{comment_id}", response_model=CommentResponse)
 def update_comment(
     comment_id: int,
     comment: CommentCreate,

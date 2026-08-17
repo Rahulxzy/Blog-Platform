@@ -18,10 +18,31 @@ class UserResponse(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
+
+## ----Post Schemas----
+
 class PostCreate(BaseModel):
     title: str
     content: str
 
+class PostResponse(BaseModel):
+    id: int
+    title: str
+    content: str
+    user_id: int
+
+    model_config = ConfigDict(from_attributes = True)
+
+
+## ----Comment Schemas----
+
 class CommentCreate(BaseModel):
     content: str
 
+class CommentResponse(BaseModel):
+    id: int
+    content: str
+    user_id: int
+    post_id: int
+
+    model_config = ConfigDict(from_attributes=True)
