@@ -5,6 +5,7 @@ from .database import get_db
 from .models import User
 from .utils import hash_password, verify_password
 from .security import create_access_token, get_current_user
+from fastapi.security import OAuth2PasswordRequestForm
 
 router = APIRouter()
 
@@ -29,15 +30,15 @@ def register(user: UserCreate, db: Session=Depends(get_db)):
     return new_user
 
 @router.post("/auth/login")
-def login(login_data: UserLogin, db: Session=Depends(get_db)):
-    db_user = db.query(User).filter(User.email == login_data.email).first()
+def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session=Depends(get_db)):
+    db_user = db.query(User).filter(User.email == form_data.username).first()
     if not db_user:
         raise HTTPException(
             status_code=401,
             detail="Invalid email or password"
         )
 
-    if not verify_password(login_data.password, db_user.password):
+    if not verify_password(form_data.password, db_user.password):
         raise HTTPException(
             status_code=401,
             detail="Invalid email or password"
