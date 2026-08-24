@@ -1,10 +1,15 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from .schemas import PostCreate, PostResponse
 from .database import get_db
 from .models import Post, User
 from .security import get_current_user
+from enum import Enum
+
+class SortOrder(str, Enum):
+    latest = "latest"
+    oldest = "oldest"
 
 router = APIRouter()
 
@@ -17,10 +22,21 @@ def create_post(post:PostCreate, current_user: User=Depends(get_current_user),db
     return new_post
 
 @router.get("/posts", response_model=list[PostResponse])
-def get_posts(db: Session = Depends(get_db)):
-    posts = db.query(Post).all()
-    return posts
+def get_posts(skip: int = Query(0,  ge=0), limit: int = Query(10, ge=1, le=100),title: str | None = None, sort: SortOrder = SortOrder.latest, db: Session = Depends(get_db)):
+    query = db.query(Post)
 
+    if title:
+        query = query.filter(Post.title.ilike(f"%{title}%"))
+
+    if sort == SortOrder.latest:
+        query = query.order_by(Post.id.desc())
+    elif sort == SortOrder.oldest:
+        query = query.order_by(Post.id.asc())
+
+    posts = (query.offset(skip).limit(limit).all())
+
+    return posts
+    
 @router.get("/posts/{post_id}", response_model=PostResponse)
 def get_post(post_id: int, db: Session = Depends(get_db)):
     post = db.query(Post).filter(Post.id == post_id).first()
