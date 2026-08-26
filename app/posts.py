@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
-from .schemas import PostCreate, PostResponse
+from .schemas import PostCreate, PostResponse, PostDetailResponse
 from .database import get_db
 from .models import Post, User
 from .security import get_current_user
@@ -37,7 +37,7 @@ def get_posts(skip: int = Query(0,  ge=0), limit: int = Query(10, ge=1, le=100),
 
     return posts
     
-@router.get("/posts/{post_id}", response_model=PostResponse)
+@router.get("/posts/{post_id}", response_model=PostDetailResponse)
 def get_post(post_id: int, db: Session = Depends(get_db)):
     post = db.query(Post).filter(Post.id == post_id).first()
     if not post:

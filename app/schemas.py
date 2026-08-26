@@ -1,6 +1,5 @@
 from pydantic import BaseModel, ConfigDict
 
-## ----User schemas----
 
 class UserCreate(BaseModel):
     username: str
@@ -19,8 +18,6 @@ class UserResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-## ----Post Schemas----
-
 class PostCreate(BaseModel):
     title: str
     content: str
@@ -34,7 +31,8 @@ class PostResponse(BaseModel):
     model_config = ConfigDict(from_attributes = True)
 
 
-## ----Comment Schemas----
+
+
 
 class CommentCreate(BaseModel):
     content: str
@@ -46,3 +44,7 @@ class CommentResponse(BaseModel):
     post_id: int
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class PostDetailResponse(PostResponse):
+    comments: list[CommentResponse] = []
