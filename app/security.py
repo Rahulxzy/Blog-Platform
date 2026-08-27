@@ -5,10 +5,8 @@ from datetime import datetime, timedelta, timezone
 from fastapi.security import OAuth2PasswordBearer
 from .database import get_db
 from .models import User
+from .config import settings
 
-SECRET_KEY = "your-long-random-secret-key"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl="/auth/login"
@@ -16,13 +14,13 @@ oauth2_scheme = OAuth2PasswordBearer(
 
 def create_access_token(data: dict):
     to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + timedelta(minutes = ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.now(timezone.utc) + timedelta(minutes = settings.access_token_expire_minutes)
     to_encode.update({"exp":expire})
-    return jwt.encode(to_encode,SECRET_KEY,algorithm=ALGORITHM)
+    return jwt.encode(to_encode,settings.secret_key,algorithm=settings.algorithm)
 
 def verify_access_token(token: str):
     try:
-        payload = jwt.decode(token,SECRET_KEY,algorithms=[ALGORITHM])
+        payload = jwt.decode(token,settings.secret_key,algorithms=[settings.algorithm])
         return payload
     except JWTError:
         raise HTTPException(
