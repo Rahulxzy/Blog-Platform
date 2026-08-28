@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from .schemas import UserCreate, UserResponse, UserLogin
+from .schemas import UserCreate, UserResponse
 from .database import get_db
 from .models import User
 from .utils import hash_password, verify_password
 from .security import create_access_token, get_current_user
 from fastapi.security import OAuth2PasswordRequestForm
+from sqlalchemy.exc import IntegrityError
 
 router = APIRouter()
 
@@ -24,7 +25,12 @@ def register(user: UserCreate, db: Session=Depends(get_db)):
                     password = hashed_password)
 
     db.add(new_user)
-    db.commit()
+
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+
     db.refresh(new_user)
 
     return new_user

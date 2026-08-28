@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class UserCreate(BaseModel):
@@ -6,9 +6,6 @@ class UserCreate(BaseModel):
     email: str
     password: str
 
-class UserLogin(BaseModel):
-    email: str
-    password: str
 
 class UserResponse(BaseModel):
     id: int
@@ -28,7 +25,7 @@ class PostResponse(BaseModel):
     content: str
     user_id: int
 
-    model_config = ConfigDict(from_attributes = True)
+    model_config = ConfigDict(from_attributes=True)
 
 
 
@@ -47,4 +44,4 @@ class CommentResponse(BaseModel):
 
 
 class PostDetailResponse(PostResponse):
-    comments: list[CommentResponse] = []
+    comments: list[CommentResponse] = Field(default_factory=list)

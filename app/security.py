@@ -30,12 +30,20 @@ def verify_access_token(token: str):
 
 def get_current_user(token: str = Depends(oauth2_scheme),db: Session = Depends(get_db)):
     payload = verify_access_token(token)
-    user_id = int(payload.get("sub"))
+    user_id = payload.get("sub")
     if user_id is None:
         raise HTTPException(
             status_code=401,
             detail="Could not validate credentials"
         )
+    try:
+        user_id = int(user_id)
+    except (TypeError, ValueError):
+        raise HTTPException(
+            status_code=401,
+            detail="Could not validate credentials"
+        )
+    
     db_user = db.query(User).filter(User.id == user_id).first()
     if db_user is None:
         raise HTTPException(
