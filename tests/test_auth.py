@@ -131,3 +131,4 @@ def test_get_me_without_token(client):
     response = client.get("/me")
 
     assert response.status_code == 401
+
