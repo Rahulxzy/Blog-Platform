@@ -480,3 +480,417 @@ def test_create_post_invalid_token(client):
 
     assert response.status_code == 401
 
+def test_get_post_with_comments(client):
+    client.post(
+        "/register",
+        json={
+            "username": "detailuser",
+            "email": "detail@example.com",
+            "password": "password123"
+        }
+    )
+
+    login_response = client.post(
+        "/auth/login",
+        data={
+            "username": "detail@example.com",
+            "password": "password123"
+        }
+    )
+
+    access_token = login_response.json()["access_token"]
+
+    create_post_response = client.post(
+        "/posts",
+        json={
+            "title": "Post With Comments",
+            "content": "Testing post details with comments."
+        },
+        headers={
+            "Authorization": f"Bearer {access_token}"
+        }
+    )
+
+    assert create_post_response.status_code == 200
+
+    post_id = create_post_response.json()["id"]
+
+    comment_response = client.post(
+        f"/posts/{post_id}/comments",
+        json={
+            "content": "This is a test comment."
+        },
+        headers={
+            "Authorization": f"Bearer {access_token}"
+        }
+    )
+
+    assert comment_response.status_code == 200
+
+    response = client.get(f"/posts/{post_id}")
+
+    assert response.status_code == 200
+    assert response.json()["id"] == post_id
+    assert response.json()["title"] == "Post With Comments"
+    assert response.json()["content"] == "Testing post details with comments."
+    assert len(response.json()["comments"]) == 1
+    assert response.json()["comments"][0]["content"] == "This is a test comment."
+
+def test_get_posts_with_limit(client):
+    client.post(
+        "/register",
+        json={
+            "username": "limituser",
+            "email": "limit@example.com",
+            "password": "password123"
+        }
+    )
+
+    login_response = client.post(
+        "/auth/login",
+        data={
+            "username": "limit@example.com",
+            "password": "password123"
+        }
+    )
+
+    access_token = login_response.json()["access_token"]
+
+    for i in range(3):
+        response = client.post(
+            "/posts",
+            json={
+                "title": f"Post {i}",
+                "content": f"Content {i}"
+            },
+            headers={
+                "Authorization": f"Bearer {access_token}"
+            }
+        )
+
+        assert response.status_code == 200
+
+    response = client.get("/posts?limit=2")
+
+    assert response.status_code == 200
+    assert len(response.json()) == 2
+
+def test_get_posts_with_skip(client):
+    client.post(
+        "/register",
+        json={
+            "username": "skipuser",
+            "email": "skip@example.com",
+            "password": "password123"
+        }
+    )
+
+    login_response = client.post(
+        "/auth/login",
+        data={
+            "username": "skip@example.com",
+            "password": "password123"
+        }
+    )
+
+    access_token = login_response.json()["access_token"]
+
+    for i in range(3):
+        response = client.post(
+            "/posts",
+            json={
+                "title": f"Post {i}",
+                "content": f"Content {i}"
+            },
+            headers={
+                "Authorization": f"Bearer {access_token}"
+            }
+        )
+
+        assert response.status_code == 200
+
+    response = client.get("/posts?skip=1")
+
+    assert response.status_code == 200
+    assert len(response.json()) == 2
+
+def test_get_posts_with_title_filter(client):
+    client.post(
+        "/register",
+        json={
+            "username": "filteruser",
+            "email": "filter@example.com",
+            "password": "password123"
+        }
+    )
+
+    login_response = client.post(
+        "/auth/login",
+        data={
+            "username": "filter@example.com",
+            "password": "password123"
+        }
+    )
+
+    access_token = login_response.json()["access_token"]
+
+    posts = [
+        ("Python Tutorial", "Learn Python"),
+        ("FastAPI Guide", "Learn FastAPI"),
+        ("Python Testing", "Learn pytest"),
+    ]
+
+    for title, content in posts:
+        response = client.post(
+            "/posts",
+            json={
+                "title": title,
+                "content": content
+            },
+            headers={
+                "Authorization": f"Bearer {access_token}"
+            }
+        )
+
+        assert response.status_code == 200
+
+    response = client.get("/posts?title=python")
+
+    assert response.status_code == 200
+    assert len(response.json()) == 2
+    assert response.json()[0]["title"] == "Python Testing"
+    assert response.json()[1]["title"] == "Python Tutorial"
+
+def test_get_posts_sorted_oldest(client):
+    client.post(
+        "/register",
+        json={
+            "username": "sortuser",
+            "email": "sort@example.com",
+            "password": "password123"
+        }
+    )
+
+    login_response = client.post(
+        "/auth/login",
+        data={
+            "username": "sort@example.com",
+            "password": "password123"
+        }
+    )
+
+    access_token = login_response.json()["access_token"]
+
+    for i in range(3):
+        response = client.post(
+            "/posts",
+            json={
+                "title": f"Post {i}",
+                "content": f"Content {i}"
+            },
+            headers={
+                "Authorization": f"Bearer {access_token}"
+            }
+        )
+
+        assert response.status_code == 200
+
+    response = client.get("/posts?sort=oldest")
+
+    assert response.status_code == 200
+    assert len(response.json()) == 3
+    assert response.json()[0]["title"] == "Post 0"
+    assert response.json()[1]["title"] == "Post 1"
+    assert response.json()[2]["title"] == "Post 2"
+
+def test_get_posts_sorted_latest(client):
+    client.post(
+        "/register",
+        json={
+            "username": "latestuser",
+            "email": "latest@example.com",
+            "password": "password123"
+        }
+    )
+
+    login_response = client.post(
+        "/auth/login",
+        data={
+            "username": "latest@example.com",
+            "password": "password123"
+        }
+    )
+
+    access_token = login_response.json()["access_token"]
+
+    for i in range(3):
+        response = client.post(
+            "/posts",
+            json={
+                "title": f"Post {i}",
+                "content": f"Content {i}"
+            },
+            headers={
+                "Authorization": f"Bearer {access_token}"
+            }
+        )
+
+        assert response.status_code == 200
+
+    response = client.get("/posts?sort=latest")
+
+    assert response.status_code == 200
+    assert len(response.json()) == 3
+    assert response.json()[0]["title"] == "Post 2"
+    assert response.json()[1]["title"] == "Post 1"
+    assert response.json()[2]["title"] == "Post 0"
+
+def test_get_posts_invalid_limit(client):
+    response = client.get("/posts?limit=0")
+
+    assert response.status_code == 422
+
+def test_get_posts_limit_too_large(client):
+    response = client.get("/posts?limit=101")
+
+    assert response.status_code == 422
+
+def test_get_posts_negative_skip(client):
+    response = client.get("/posts?skip=-1")
+
+    assert response.status_code == 422
+
+def test_get_posts_invalid_sort(client):
+    response = client.get("/posts?sort=random")
+
+    assert response.status_code == 422
+
+def test_get_posts_no_results(client):
+    response = client.get("/posts?title=doesnotexist")
+
+    assert response.status_code == 200
+    assert response.json() == []
+
+def test_delete_nonexistent_post(client):
+    client.post(
+        "/register",
+        json={
+            "username": "delete404user",
+            "email": "delete404@example.com",
+            "password": "password123"
+        }
+    )
+
+    login_response = client.post(
+        "/auth/login",
+        data={
+            "username": "delete404@example.com",
+            "password": "password123"
+        }
+    )
+
+    access_token = login_response.json()["access_token"]
+
+    response = client.delete(
+        "/posts/999999",
+        headers={
+            "Authorization": f"Bearer {access_token}"
+        }
+    )
+
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Post not found"
+
+def test_update_post_missing_title(client):
+    client.post(
+        "/register",
+        json={
+            "username": "updatetitleuser",
+            "email": "updatetitle@example.com",
+            "password": "password123"
+        }
+    )
+
+    login_response = client.post(
+        "/auth/login",
+        data={
+            "username": "updatetitle@example.com",
+            "password": "password123"
+        }
+    )
+
+    access_token = login_response.json()["access_token"]
+
+    create_response = client.post(
+        "/posts",
+        json={
+            "title": "Original Title",
+            "content": "Original Content"
+        },
+        headers={
+            "Authorization": f"Bearer {access_token}"
+        }
+    )
+
+    assert create_response.status_code == 200
+
+    post_id = create_response.json()["id"]
+
+    response = client.put(
+        f"/posts/{post_id}",
+        json={
+            "content": "Updated Content"
+        },
+        headers={
+            "Authorization": f"Bearer {access_token}"
+        }
+    )
+
+    assert response.status_code == 422
+
+def test_update_post_missing_content(client):
+    client.post(
+        "/register",
+        json={
+            "username": "updatecontentuser",
+            "email": "updatecontent@example.com",
+            "password": "password123"
+        }
+    )
+
+    login_response = client.post(
+        "/auth/login",
+        data={
+            "username": "updatecontent@example.com",
+            "password": "password123"
+        }
+    )
+
+    access_token = login_response.json()["access_token"]
+
+    create_response = client.post(
+        "/posts",
+        json={
+            "title": "Original Title",
+            "content": "Original Content"
+        },
+        headers={
+            "Authorization": f"Bearer {access_token}"
+        }
+    )
+
+    assert create_response.status_code == 200
+
+    post_id = create_response.json()["id"]
+
+    response = client.put(
+        f"/posts/{post_id}",
+        json={
+            "title": "Updated Title"
+        },
+        headers={
+            "Authorization": f"Bearer {access_token}"
+        }
+    )
+
+    assert response.status_code == 422
