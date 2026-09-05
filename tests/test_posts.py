@@ -29,7 +29,7 @@ def test_create_post(client):
         }
     )
 
-    assert response.status_code == 200
+    assert response.status_code == 201
     assert response.json()["title"] == "my first post"
     assert response.json()["content"] == "this is my first post."
     assert "id" in response.json()
@@ -77,7 +77,7 @@ def test_get_posts(client):
         }
     )
 
-    assert create_response.status_code == 200
+    assert create_response.status_code == 201
 
     response = client.get("/posts")
 
@@ -117,7 +117,7 @@ def test_get_single_post(client):
         }
     )
 
-    assert create_response.status_code == 200
+    assert create_response.status_code == 201
 
     post_id = create_response.json()["id"]
 
@@ -165,7 +165,7 @@ def test_update_post(client):
         }
     )
 
-    assert create_response.status_code == 200
+    assert create_response.status_code == 201
 
     post_id = create_response.json()["id"]
 
@@ -216,7 +216,7 @@ def test_update_post_unauthorized(client):
         }
     )
 
-    assert create_response.status_code == 200
+    assert create_response.status_code == 201
 
     post_id = create_response.json()["id"]
 
@@ -283,7 +283,7 @@ def test_delete_post(client):
         }
     )
 
-    assert create_response.status_code == 200
+    assert create_response.status_code == 201
 
     post_id = create_response.json()["id"]
 
@@ -332,7 +332,7 @@ def test_delete_post_unauthorized(client):
         }
     )
 
-    assert create_response.status_code == 200
+    assert create_response.status_code == 201
 
     post_id = create_response.json()["id"]
 
@@ -511,7 +511,7 @@ def test_get_post_with_comments(client):
         }
     )
 
-    assert create_post_response.status_code == 200
+    assert create_post_response.status_code == 201
 
     post_id = create_post_response.json()["id"]
 
@@ -525,7 +525,7 @@ def test_get_post_with_comments(client):
         }
     )
 
-    assert comment_response.status_code == 200
+    assert comment_response.status_code == 201
 
     response = client.get(f"/posts/{post_id}")
 
@@ -568,7 +568,7 @@ def test_get_posts_with_limit(client):
             }
         )
 
-        assert response.status_code == 200
+        assert response.status_code == 201
 
     response = client.get("/posts?limit=2")
 
@@ -607,7 +607,7 @@ def test_get_posts_with_skip(client):
             }
         )
 
-        assert response.status_code == 200
+        assert response.status_code == 201
 
     response = client.get("/posts?skip=1")
 
@@ -652,7 +652,7 @@ def test_get_posts_with_title_filter(client):
             }
         )
 
-        assert response.status_code == 200
+        assert response.status_code == 201
 
     response = client.get("/posts?title=python")
 
@@ -693,7 +693,7 @@ def test_get_posts_sorted_oldest(client):
             }
         )
 
-        assert response.status_code == 200
+        assert response.status_code == 201
 
     response = client.get("/posts?sort=oldest")
 
@@ -735,7 +735,7 @@ def test_get_posts_sorted_latest(client):
             }
         )
 
-        assert response.status_code == 200
+        assert response.status_code == 201
 
     response = client.get("/posts?sort=latest")
 
@@ -832,7 +832,7 @@ def test_update_post_missing_title(client):
         }
     )
 
-    assert create_response.status_code == 200
+    assert create_response.status_code == 201
 
     post_id = create_response.json()["id"]
 
@@ -879,7 +879,7 @@ def test_update_post_missing_content(client):
         }
     )
 
-    assert create_response.status_code == 200
+    assert create_response.status_code == 201
 
     post_id = create_response.json()["id"]
 

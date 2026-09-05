@@ -14,7 +14,7 @@ def test_register_user(client):
         }
     )
 
-    assert response.status_code == 200
+    assert response.status_code == 201
     assert response.json()["username"] == "testuser"
     assert response.json()["email"] == "test@example.com"
     assert "password" not in response.json()
@@ -27,7 +27,7 @@ def test_register_duplicate_email(client):
     }
 
     response = client.post("/register", json=user_data)
-    assert response.status_code == 200
+    assert response.status_code == 201
 
     duplicate_response = client.post(
         "/register",

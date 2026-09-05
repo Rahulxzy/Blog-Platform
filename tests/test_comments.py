@@ -29,7 +29,7 @@ def test_create_comment(client):
         }
     )
 
-    assert create_post_response.status_code == 200
+    assert create_post_response.status_code == 201
 
     post_id = create_post_response.json()["id"]
 
@@ -43,7 +43,7 @@ def test_create_comment(client):
         }
     )
 
-    assert response.status_code == 200
+    assert response.status_code == 201
     assert response.json()["content"] == "This is my first comment."
     assert "id" in response.json()
     assert "user_id" in response.json()
@@ -123,7 +123,7 @@ def test_get_comments(client):
         }
     )
 
-    assert create_post_response.status_code == 200
+    assert create_post_response.status_code == 201
 
     post_id = create_post_response.json()["id"]
 
@@ -137,7 +137,7 @@ def test_get_comments(client):
         }
     )
 
-    assert create_comment_response.status_code == 200
+    assert create_comment_response.status_code == 201
 
     response = client.get(f"/posts/{post_id}/comments")
 
@@ -183,7 +183,7 @@ def test_update_comment(client):
         }
     )
 
-    assert create_post_response.status_code == 200
+    assert create_post_response.status_code == 201
 
     post_id = create_post_response.json()["id"]
 
@@ -197,7 +197,7 @@ def test_update_comment(client):
         }
     )
 
-    assert create_comment_response.status_code == 200
+    assert create_comment_response.status_code == 201
 
     comment_id = create_comment_response.json()["id"]
 
@@ -246,7 +246,7 @@ def test_update_comment_unauthorized(client):
         }
     )
 
-    assert create_post_response.status_code == 200
+    assert create_post_response.status_code == 201
 
     post_id = create_post_response.json()["id"]
 
@@ -260,7 +260,7 @@ def test_update_comment_unauthorized(client):
         }
     )
 
-    assert create_comment_response.status_code == 200
+    assert create_comment_response.status_code == 201
 
     comment_id = create_comment_response.json()["id"]
 
@@ -360,7 +360,7 @@ def test_delete_comment(client):
         }
     )
 
-    assert create_post_response.status_code == 200
+    assert create_post_response.status_code == 201
 
     post_id = create_post_response.json()["id"]
 
@@ -374,7 +374,7 @@ def test_delete_comment(client):
         }
     )
 
-    assert create_comment_response.status_code == 200
+    assert create_comment_response.status_code == 201
 
     comment_id = create_comment_response.json()["id"]
 
@@ -421,7 +421,7 @@ def test_delete_comment_unauthorized(client):
         }
     )
 
-    assert create_post_response.status_code == 200
+    assert create_post_response.status_code == 201
 
     post_id = create_post_response.json()["id"]
 
@@ -436,7 +436,7 @@ def test_delete_comment_unauthorized(client):
         }
     )
 
-    assert create_comment_response.status_code == 200
+    assert create_comment_response.status_code == 201
 
     comment_id = create_comment_response.json()["id"]
 
@@ -532,7 +532,7 @@ def test_create_comment_missing_content(client):
         }
     )
 
-    assert create_post_response.status_code == 200
+    assert create_post_response.status_code == 201
 
     post_id = create_post_response.json()["id"]
 
@@ -577,7 +577,7 @@ def test_update_comment_missing_content(client):
         }
     )
 
-    assert create_post_response.status_code == 200
+    assert create_post_response.status_code == 201
 
     post_id = create_post_response.json()["id"]
 
@@ -591,7 +591,7 @@ def test_update_comment_missing_content(client):
         }
     )
 
-    assert create_comment_response.status_code == 200
+    assert create_comment_response.status_code == 201
 
     comment_id = create_comment_response.json()["id"]
 

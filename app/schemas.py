@@ -19,6 +19,7 @@ class PostCreate(BaseModel):
     title: str
     content: str
 
+
 class PostResponse(BaseModel):
     id: int
     title: str
@@ -28,11 +29,9 @@ class PostResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-
-
-
 class CommentCreate(BaseModel):
     content: str
+
 
 class CommentResponse(BaseModel):
     id: int
