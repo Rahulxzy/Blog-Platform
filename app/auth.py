@@ -53,6 +53,10 @@ def register(
         db.commit()
     except IntegrityError:
         db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="email or username already exists"
+        )
 
     db.refresh(new_user)
 

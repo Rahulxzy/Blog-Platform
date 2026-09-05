@@ -60,9 +60,9 @@ def get_posts(
         query = query.filter(Post.title.ilike(f"%{title}%"))
 
     if sort == SortOrder.latest:
-        query = query.order_by(Post.id.desc())
+        query = query.order_by(Post.created_at.desc())
     elif sort == SortOrder.oldest:
-        query = query.order_by(Post.id.asc())
+        query = query.order_by(Post.created_at.asc())
 
     posts = query.offset(skip).limit(limit).all()
 

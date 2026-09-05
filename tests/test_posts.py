@@ -894,3 +894,36 @@ def test_update_post_missing_content(client):
     )
 
     assert response.status_code == 422
+
+def test_create_post_short_title(client):
+    client.post(
+        "/register",
+        json={
+            "username": "shorttitleuser",
+            "email": "shorttitle@example.com",
+            "password": "password123"
+        }
+    )
+
+    login_response = client.post(
+        "/auth/login",
+        data={
+            "username": "shorttitle@example.com",
+            "password": "password123"
+        }
+    )
+
+    access_token = login_response.json()["access_token"]
+
+    response = client.post(
+        "/posts",
+        json={
+            "title": "ab",
+            "content": "This content is valid."
+        },
+        headers={
+            "Authorization": f"Bearer {access_token}"
+        }
+    )
+
+    assert response.status_code == 422

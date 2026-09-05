@@ -132,3 +132,27 @@ def test_get_me_without_token(client):
 
     assert response.status_code == 401
 
+def test_register_invalid_email(client):
+    response = client.post(
+        "/register",
+        json={
+            "username": "validuser",
+            "email": "not-an-email",
+            "password": "password123"
+        }
+    )
+
+    assert response.status_code == 422
+
+
+def test_register_short_password(client):
+    response = client.post(
+        "/register",
+        json={
+            "username": "validuser",
+            "email": "valid@example.com",
+            "password": "short"
+        }
+    )
+
+    assert response.status_code == 422

@@ -168,8 +168,6 @@ Protected endpoints require a valid Bearer token.
 ## Future Improvements
 
 - Add PostgreSQL support
-- Add database migrations with Alembic
-- Add automated tests with Pytest
 - Add Docker support
 - Add CI/CD with GitHub Actions
 - Add refresh token support

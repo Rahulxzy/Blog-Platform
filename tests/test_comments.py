@@ -604,3 +604,48 @@ def test_update_comment_missing_content(client):
     )
 
     assert response.status_code == 422
+
+def test_create_comment_empty_content(client):
+    client.post(
+        "/register",
+        json={
+            "username": "emptycommentuser",
+            "email": "emptycomment@example.com",
+            "password": "password123"
+        }
+    )
+
+    login_response = client.post(
+        "/auth/login",
+        data={
+            "username": "emptycomment@example.com",
+            "password": "password123"
+        }
+    )
+
+    access_token = login_response.json()["access_token"]
+
+    create_post_response = client.post(
+        "/posts",
+        json={
+            "title": "Empty Comment Test",
+            "content": "Post for empty comment testing."
+        },
+        headers={
+            "Authorization": f"Bearer {access_token}"
+        }
+    )
+
+    post_id = create_post_response.json()["id"]
+
+    response = client.post(
+        f"/posts/{post_id}/comments",
+        json={
+            "content": ""
+        },
+        headers={
+            "Authorization": f"Bearer {access_token}"
+        }
+    )
+
+    assert response.status_code == 422
